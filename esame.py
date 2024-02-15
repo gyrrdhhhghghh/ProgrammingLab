@@ -1,8 +1,6 @@
 class ExamException(Exception):
     pass
 
-#ricordarsi di scrivere tutti gli errori o in ita o in ing, non entrambi 
-
 class CSVTimeSeriesFile():
     def __init__(self, name):
         self.name = name
@@ -34,14 +32,12 @@ class CSVTimeSeriesFile():
             
             # se manca o la data o i passeggeri, continuo senza alzare eccezioni
             if len(values) < 2:
-                print("len(values) < 2")
                 continue
 
             # se manca l'anno o il mese, continuo senza alzare eccezioni
             date_part = values[0] # e.g. '1900-02'
             date_array = date_part.split('-') #['1900', '02']
             if len(date_array) < 2:
-                print("len(date_array) < 2")
                 continue
 
             # controllo che il mese sia un int
@@ -86,12 +82,10 @@ class CSVTimeSeriesFile():
             try:
                 int_passengers = int(passengers_part)
             except:
-                print("int_passengers = int({})".format(passengers_part))
                 continue
 
             # controllo che il numero dei passeggeri sia positivo
             if int_passengers < 0:
-                print('{} < 0'.format(int_passengers))
                 continue
 
             # inserisco i valori nel nested array
@@ -108,7 +102,7 @@ class CSVTimeSeriesFile():
 
 def compute_increments(time_series, first_year, last_year):
     
-        #controllo se ci sono errori negli input
+    # controllo se ci sono errori negli input
     if isinstance(time_series, list) is False:
         raise ExamException('Errore, time_series non è una lista')
     
@@ -125,17 +119,14 @@ def compute_increments(time_series, first_year, last_year):
         raise ExamException('Errore, conversione a int fallita')
 
     if int_first_year is None  or int_last_year is None:
-        raise ExamException('Errore, first_year or last_year is None')
+        raise ExamException('Errore, first_year o last_year è None')
 
     if int_first_year > int_last_year:
         raise ExamException('Errore, first_year > last_year')
     
     if int_first_year < 0 or int_last_year < 0:
-        raise ExamException('Errore, first_year or last_year is less than zero')
+        raise ExamException('Errore, first_year o last_year < 0')
     
-    # (?) non controllo i duplicati perchè poi userò un dizionario
-    # che li elimina automaticamente (?)
-
     # ora divido in anni e mesi
     valori_per_anno = {}
     for element in time_series:
@@ -148,20 +139,18 @@ def compute_increments(time_series, first_year, last_year):
             valori_per_anno[int_anno] = [element[1]]
         else:
             valori_per_anno[int_anno].append(element[1])
-        # esempio:
-        # valori_per_anno = {1990: [44, 432, 344, 34], 1991: [200, 340, 120]}
-        # la key è l'anno, il valore sono i passeggeri
-        # Se invece l’intervallo considerato è di soli 
+    # esempio:
+    # valori_per_anno = {1990: [44, 432, 344, 34], 1991: [200, 340, 120]}
+    # la key è l'anno, il valore sono i passeggeri
+            
+    # Se l’intervallo considerato è di soli 
     # due anni e per uno dei due anni non abbiamo misurazioni,
     # l’output sarà una lista vuota. 
     
     if int_last_year == int_first_year+1:
         if int_last_year not in valori_per_anno or int_first_year not in valori_per_anno:
-            print("int_last_year == int_first_year+1")
             return []
             
-    print(valori_per_anno)
-
     media_per_anni = {}
     for key in valori_per_anno:
         m = valori_per_anno[key]
@@ -173,7 +162,7 @@ def compute_increments(time_series, first_year, last_year):
     result = {}
     previous_key = 0
     for key in media_per_anni:
-        if key< int_first_year:
+        if key < int_first_year:
             continue
         if key > int_last_year:
             break
@@ -182,8 +171,3 @@ def compute_increments(time_series, first_year, last_year):
         previous_key = key
 
     return result
-
-
-x = CSVTimeSeriesFile('voli_anno_duplicato.csv')
-y = x.get_data()
-print(compute_increments(y, "1949", "1950"))
